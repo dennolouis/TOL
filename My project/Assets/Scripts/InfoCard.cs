@@ -1,18 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class InfoCard : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    [SerializeField] TextMeshProUGUI memberName;
+    [SerializeField] TextMeshProUGUI birthday;
+
+    public void SetMember(Member member)
     {
-        
+        memberName.text = member.name;
+        birthday.text = member.birthday.ToString();
     }
 }

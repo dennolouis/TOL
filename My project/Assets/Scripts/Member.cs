@@ -2,8 +2,8 @@ using System;
 
 public struct Member
 {
-    string name { get; set; }
-    DateTime birthday { get; set; }
+    public string name { get; set; }
+    public DateTime birthday { get; set; }
 
     public Member(string name, DateTime birthday)
     {
