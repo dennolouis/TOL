@@ -8,8 +8,10 @@ public class BirthdayPage : MonoBehaviour
     [SerializeField] GameObject infoCardPrefab;
 
     List<Member> members = new List<Member>();
+    List<GameObject> memberCards = new List<GameObject>();
+    int activememberCards;
     
-    void Start()
+    void Awake ()
     {
         //Mock data
         members.Add(new Member("Denno", new System.DateTime(2001, 01, 18)));
@@ -46,12 +48,29 @@ public class BirthdayPage : MonoBehaviour
                 GameObject instantiatedUI = Instantiate(infoCardPrefab, panel.transform);
                 // Optionally, you can set properties or adjust the instantiated UI here
                 instantiatedUI.GetComponent<InfoCard>().SetMember(member);
-            }
-            
+                memberCards.Add(instantiatedUI);
+                print(member.birthday.Month);
+            }        
         }
         else
         {
             Debug.LogError("Panel or UI Prefab references are missing!");
         }
+    }
+
+    public void HandleBirthdayCardVisability(int monthIdx)
+    {
+        activememberCards = 0;
+        foreach(GameObject memberCard in memberCards)
+        {
+            int memberBirthmonth = memberCard.GetComponent<InfoCard>().GetBirthMonth()- 1;
+            memberCard.SetActive(monthIdx == memberBirthmonth);
+            if (monthIdx == memberBirthmonth) activememberCards++;
+        }
+    }
+    
+    public int GetActivememberCards()
+    {
+        return activememberCards;
     }
 }
