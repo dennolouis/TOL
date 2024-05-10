@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,14 +18,16 @@ public class MonthCard : MonoBehaviour
         {"January","February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
     int monthIdx;
-    void Awake()
-    {
-        HandleCurrentMonth(0);
-    }
 
     private void Start()
     {
         birthdayPage.HandleBirthdayCardVisability(monthIdx);
+
+        DateTime today = DateTime.Today;
+
+        int todayMonthIdx = today.Month - 1;
+
+        HandleCurrentMonth(todayMonthIdx);
     }
 
     public void Next()

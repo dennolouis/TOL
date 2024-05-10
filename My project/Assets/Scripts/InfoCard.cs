@@ -12,12 +12,17 @@ public class InfoCard : MonoBehaviour
     public void SetMember(Member member)
     {
         memberName.text = member.name;
-        birthday.text = member.birthday.ToString();
+        birthday.text = FormatBirthday(member.birthday);
         birthmonth = member.birthday.Month;
     }
 
     public int GetBirthMonth()
     {
         return birthmonth;
+    }
+
+    string FormatBirthday(DateTime birthday)
+    {
+        return birthday.Day.ToString();
     }
 }

@@ -49,7 +49,6 @@ public class BirthdayPage : MonoBehaviour
                 // Optionally, you can set properties or adjust the instantiated UI here
                 instantiatedUI.GetComponent<InfoCard>().SetMember(member);
                 memberCards.Add(instantiatedUI);
-                print(member.birthday.Month);
             }        
         }
         else
