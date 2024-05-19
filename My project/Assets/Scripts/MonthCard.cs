@@ -1,50 +1,52 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MonthCard : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI currentMonth;
-    [SerializeField] Button next;
-    [SerializeField] Button prev;
-    [SerializeField] TextMeshProUGUI results;
+    [SerializeField] private TextMeshProUGUI currentMonth;
+    [SerializeField] private Button next;
+    [SerializeField] private Button prev;
+    [SerializeField] private TextMeshProUGUI results;
+    [SerializeField] private BirthdayPage birthdayPage;
 
-    [SerializeField] BirthdayPage birthdayPage;
+    private string[] months =
+    {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    };
 
-    string[] months = 
-        {"January","February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-
-    int monthIdx;
+    private int monthIdx;
 
     private void Start()
     {
-        birthdayPage.HandleBirthdayCardVisability(monthIdx);
-
         DateTime today = DateTime.Today;
-
         int todayMonthIdx = today.Month - 1;
+        monthIdx = todayMonthIdx; // Ensure the initial month index is set
 
+        // Handle the current month visibility and UI updates
         HandleCurrentMonth(todayMonthIdx);
+
+        next.onClick.AddListener(Next);
+        prev.onClick.AddListener(Prev);
     }
 
     public void Next()
     {
         HandleCurrentMonth(++monthIdx);
     }
-    
+
     public void Prev()
     {
         HandleCurrentMonth(--monthIdx);
     }
 
-    void HandleCurrentMonth(int month)
+    private void HandleCurrentMonth(int month)
     {
-        monthIdx = month == -1? 11: month % 12;
+        monthIdx = (month + 12) % 12;
         currentMonth.text = months[monthIdx];
-        birthdayPage.HandleBirthdayCardVisability(monthIdx);
-        results.text = "Results: " + birthdayPage.GetActivememberCards().ToString();
+        birthdayPage.HandleBirthdayCardVisibility(monthIdx);
+        results.text = "Results: " + birthdayPage.GetActiveMemberCards(); // Ensure results are updated
     }
 }

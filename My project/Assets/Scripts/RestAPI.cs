@@ -1,42 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class RestAPI : MonoBehaviour
 {
-    string URL = "https://664a4c03a300e8795d419292.mockapi.io/members";
-    int totalResults;
+    private const string URL = "https://664a4c03a300e8795d419292.mockapi.io/members";
+    private List<Member> members = new List<Member>();
 
-    List<Member> members = new List<Member>();
-    private void Awake()
+    public async Task InitializeAsync()
     {
-        Initialize();
-        print("1");
+        await GetDataAsync();
     }
-    void Start()
-    {
 
-    }
-    public void Initialize()
+    public async Task AddNewMemberAsync(Member newMember)
     {
-        StartCoroutine(GetData());
-    }
-    IEnumerator AddNewMember()
-    {
-        // Define the new member data
-        string newMemberJson = "{\"name\":\"Dina\",\"birthday\":16,\"birthmonth\":11,\"id\":\"2\"}";
+        string newMemberJson = JsonUtility.ToJson(new
+        {
+            name = newMember.Name,
+            birthday = newMember.Birthday.Day,
+            birthmonth = newMember.Birthday.Month,
+            id = members.Count + 1 // assuming sequential IDs
+        });
 
-        // Create a POST request to add the new member
-        using (UnityWebRequest request = UnityWebRequest.PostWwwForm(URL, "POST"))
+        using (UnityWebRequest request = new UnityWebRequest(URL, "POST"))
         {
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(newMemberJson);
             request.uploadHandler = new UploadHandlerRaw(jsonToSend);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
 
-            // Send the request
-            yield return request.SendWebRequest();
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+                await Task.Yield();
 
             if (request.result == UnityWebRequest.Result.ConnectionError)
             {
@@ -44,20 +41,19 @@ public class RestAPI : MonoBehaviour
             }
             else
             {
-                // Log the response
                 Debug.Log("New member added: " + request.downloadHandler.text);
-
-                // Now retrieve the updated data
-                StartCoroutine(GetData());
+                await GetDataAsync();
             }
         }
     }
 
-    IEnumerator GetData()
+    public async Task GetDataAsync()
     {
         using (UnityWebRequest request = UnityWebRequest.Get(URL))
         {
-            yield return request.SendWebRequest();
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+                await Task.Yield();
 
             if (request.result == UnityWebRequest.Result.ConnectionError)
             {
@@ -68,17 +64,19 @@ public class RestAPI : MonoBehaviour
                 string json = request.downloadHandler.text;
                 SimpleJSON.JSONNode stats = SimpleJSON.JSON.Parse(json);
 
-                // Print all names and the total number of results
-                int totalCount = stats.Count;
-                for (int i = 0; i < totalCount; i++)
+                members.Clear();
+                for (int i = 0; i < stats.Count; i++)
                 {
-                    Debug.Log("Name: " + stats[i]["name"]);
-                    members.Add(new Member(stats[i]["name"], new System.DateTime(2001, stats[i]["birthmonth"], stats[i]["birthday"])));
+                    string name = stats[i]["name"];
+                    int day = stats[i]["birthday"].AsInt;
+                    int month = stats[i]["birthmonth"].AsInt;
+                    members.Add(new Member(name, new System.DateTime(2001, month, day)));
                 }
-                Debug.Log("Total number of results: " + totalCount);
+                Debug.Log("Total number of results: " + members.Count);
             }
         }
     }
+
     public List<Member> GetMembers()
     {
         return members;

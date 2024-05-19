@@ -1,28 +1,22 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class InfoCard : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI memberName;
-    [SerializeField] TextMeshProUGUI birthday;
-    int birthmonth;
+    [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private TextMeshProUGUI birthdayText;
+
+    private Member member;
+
     public void SetMember(Member member)
     {
-        memberName.text = member.name;
-        birthday.text = FormatBirthday(member.birthday);
-        birthmonth = member.birthday.Month;
+        this.member = member;
+        nameText.text = member.Name;
+        birthdayText.text = member.Birthday.ToString("MMMM dd");
     }
 
     public int GetBirthMonth()
     {
-        return birthmonth;
-    }
-
-    string FormatBirthday(DateTime birthday)
-    {
-        return birthday.Day.ToString();
+        return member.Birthday.Month;
     }
 }

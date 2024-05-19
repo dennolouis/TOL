@@ -1,13 +1,13 @@
 using System;
 
-public struct Member
+public class Member
 {
-    public string name { get; set; }
-    public DateTime birthday { get; set; }
+    public string Name { get; private set; }
+    public DateTime Birthday { get; private set; }
 
     public Member(string name, DateTime birthday)
     {
-        this.name = name;
-        this.birthday = birthday;
+        this.Name = name;
+        this.Birthday = birthday;
     }
 }
