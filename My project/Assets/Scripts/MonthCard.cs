@@ -46,7 +46,7 @@ public class MonthCard : MonoBehaviour
     {
         monthIdx = (month + 12) % 12;
         currentMonth.text = months[monthIdx];
-        birthdayPage.HandleBirthdayCardVisibility(monthIdx);
-        results.text = "Results: " + birthdayPage.GetActiveMemberCards(); // Ensure results are updated
+        birthdayPage.HandleBirthdayCardVisability(monthIdx);
+        results.text = "Results: " + birthdayPage.GetActivememberCards(); // Ensure results are updated
     }
 }

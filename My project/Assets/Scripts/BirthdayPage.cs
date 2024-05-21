@@ -1,51 +1,40 @@
 using System;
 using System.Collections.Generic;
-using TMPro;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class BirthdayPage : MonoBehaviour
 {
-    [SerializeField] private GameObject panel;
-    [SerializeField] private GameObject infoCardPrefab;
-    [SerializeField] private TextMeshProUGUI results; // Add this field
+    [SerializeField] GameObject panel;
+    [SerializeField] GameObject infoCardPrefab;
 
-    private List<Member> members = new List<Member>();
-    private List<GameObject> memberCards = new List<GameObject>();
-    private int activeMemberCards;
+    List<Member> members = new List<Member>();
+    List<GameObject> memberCards = new List<GameObject>();
+    int activememberCards;
 
-    private RestAPI api;
+    RestAPI api;
 
-    private async void Start()
+    async void Start()
     {
         api = FindObjectOfType<RestAPI>();
-        await api.InitializeAsync();
-        members = api.GetMembers();
-        InstantiatePrefabIntoPanel();
-
-        // Ensure only the current month's member cards are visible
-        DateTime today = DateTime.Today;
-        int todayMonthIdx = today.Month - 1;
-        HandleBirthdayCardVisibility(todayMonthIdx);
-        UpdateResultsCount(); // Update the results count
+        await RefreshData();
     }
 
     public void InstantiatePrefabIntoPanel()
     {
+        foreach (GameObject card in memberCards)
+        {
+            Destroy(card);
+        }
+        memberCards.Clear();
+
         if (panel != null && infoCardPrefab != null)
         {
             foreach (Member member in members)
             {
                 GameObject instantiatedUI = Instantiate(infoCardPrefab, panel.transform);
-                InfoCard infoCard = instantiatedUI.GetComponent<InfoCard>();
-                if (infoCard != null)
-                {
-                    infoCard.SetMember(member);
-                    memberCards.Add(instantiatedUI);
-                }
-                else
-                {
-                    Debug.LogError("InfoCard component not found on instantiated prefab.");
-                }
+                instantiatedUI.GetComponent<InfoCard>().SetMember(member);
+                memberCards.Add(instantiatedUI);
             }
         }
         else
@@ -54,34 +43,29 @@ public class BirthdayPage : MonoBehaviour
         }
     }
 
-    public void HandleBirthdayCardVisibility(int monthIdx)
+    public void HandleBirthdayCardVisability(int monthIdx)
     {
-        activeMemberCards = 0;
+        activememberCards = 0;
         foreach (GameObject memberCard in memberCards)
         {
             int memberBirthmonth = memberCard.GetComponent<InfoCard>().GetBirthMonth() - 1;
             memberCard.SetActive(monthIdx == memberBirthmonth);
-            if (monthIdx == memberBirthmonth) activeMemberCards++;
+            if (monthIdx == memberBirthmonth) activememberCards++;
         }
     }
 
-    public int GetActiveMemberCards()
+    public int GetActivememberCards()
     {
-        return activeMemberCards;
+        return activememberCards;
     }
 
-    public void RefreshData()
+    public async Task RefreshData()
     {
+        await api.GetDataAsync();
         members = api.GetMembers();
         InstantiatePrefabIntoPanel();
-    }
-
-    // Add this method to update the results count
-    private void UpdateResultsCount()
-    {
-        if (results != null)
-        {
-            results.text = "Results: " + GetActiveMemberCards();
-        }
+        // Update visibility after refreshing data
+        DateTime today = DateTime.Today;
+        HandleBirthdayCardVisability(today.Month - 1);
     }
 }
