@@ -68,4 +68,19 @@ public class BirthdayPage : MonoBehaviour
         DateTime today = DateTime.Today;
         HandleBirthdayCardVisability(today.Month - 1);
     }
+
+    public void CopyActiveMembersToClipboard()
+    {
+        List<string> activeMembersInfo = new List<string>();
+        foreach (GameObject memberCard in memberCards)
+        {
+            if (memberCard.activeSelf)
+            {
+                InfoCard infoCard = memberCard.GetComponent<InfoCard>();
+                activeMembersInfo.Add($"{infoCard.GetMemberName()} - {infoCard.GetBirthDayMonth()}");
+            }
+        }
+        GUIUtility.systemCopyBuffer = string.Join("\n", activeMembersInfo);
+        Debug.Log("Active members copied to clipboard:\n" + GUIUtility.systemCopyBuffer);
+    }
 }

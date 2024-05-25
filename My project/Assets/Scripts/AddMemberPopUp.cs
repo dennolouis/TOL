@@ -28,8 +28,8 @@ public class AddMemberPopUp : MonoBehaviour
         monthDropdown.ClearOptions();
         List<string> months = new List<string>
         {
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
+            "Jan", "Feb", "March", "April", "May", "June",
+            "July", "Aug", "Sept", "Oct", "Nov", "Dec"
         };
         monthDropdown.AddOptions(months);
     }
@@ -50,8 +50,15 @@ public class AddMemberPopUp : MonoBehaviour
         popUpPanel.SetActive(true);
     }
 
+    public void ClosePopUp()
+    {
+        popUpPanel.SetActive(false);
+    }
+
     private void OnSubmit()
     {
+        if (!CheckNameEntered()) return;
+
         string name = nameInputField.text;
         int month = monthDropdown.value + 1; // Dropdown value is 0-based, adding 1 for correct month number
         int day = int.Parse(dayDropdown.options[dayDropdown.value].text);
@@ -65,5 +72,15 @@ public class AddMemberPopUp : MonoBehaviour
         nameInputField.text = string.Empty;
         monthDropdown.value = 0;
         dayDropdown.value = 0;
+    }
+
+    bool CheckNameEntered()
+    {
+        if(nameInputField.text == "" || nameInputField.text == "Enter a name!!")
+        {
+            nameInputField.text = "Enter a name!!";
+            return false;
+        }
+        return true;
     }
 }

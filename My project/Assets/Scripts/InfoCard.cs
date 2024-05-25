@@ -12,11 +12,21 @@ public class InfoCard : MonoBehaviour
     {
         this.member = member;
         nameText.text = member.name;
-        birthdayText.text = member.birthday.ToString("MMMM dd");
+        birthdayText.text = member.birthday.ToString();
     }
 
     public int GetBirthMonth()
     {
         return member.birthmonth;
+    }
+
+    public string GetMemberName()
+    {
+        return member.name;
+    }
+
+    public string GetBirthDayMonth()
+    {
+        return $"{member.birthmonth}/{member.birthday}";
     }
 }
