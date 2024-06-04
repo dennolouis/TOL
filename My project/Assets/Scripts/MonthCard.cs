@@ -30,6 +30,9 @@ public class MonthCard : MonoBehaviour
 
         next.onClick.AddListener(Next);
         prev.onClick.AddListener(Prev);
+
+        Invoke("Next", 0.05f);
+        Invoke("Prev", 0.05f);
     }
 
     public void Next()
