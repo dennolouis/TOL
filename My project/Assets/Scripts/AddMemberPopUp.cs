@@ -12,6 +12,9 @@ public class AddMemberPopUp : MonoBehaviour
     [SerializeField] private Button submitButton;
     [SerializeField] private GameObject popUpPanel;
 
+    BirthdayPage birthdayPage;
+    MonthCard monthCard;
+
     private RestAPI restAPI;
 
     private void Start()
@@ -21,6 +24,9 @@ public class AddMemberPopUp : MonoBehaviour
         InitializeDayDropdown();
         submitButton.onClick.AddListener(OnSubmit);
         popUpPanel.SetActive(false);
+
+        birthdayPage = FindObjectOfType<BirthdayPage>();
+        monthCard = FindObjectOfType<MonthCard>();
     }
 
     private void InitializeMonthDropdown()
@@ -72,6 +78,9 @@ public class AddMemberPopUp : MonoBehaviour
         nameInputField.text = string.Empty;
         monthDropdown.value = 0;
         dayDropdown.value = 0;
+
+        birthdayPage.AddNewInfoCard(new Member(name, month, day));
+        monthCard.HandleCurrentMonth(month - 1);
     }
 
     bool CheckNameEntered()

@@ -6,12 +6,14 @@ using UnityEngine.Networking;
 
 public class RestAPI : MonoBehaviour
 {
-    private const string URL = "https://664a4c03a300e8795d419292.mockapi.io/members";
+    private const string Legacy_URL = "https://664a4c03a300e8795d419292.mockapi.io/members";
+    private const string URL = "https://664a4c03a300e8795d419292.mockapi.io/members2";
     private List<Member> members = new List<Member>();
 
     public async Task InitializeAsync()
     {
-        await GetDataAsync();
+        members.Clear(); // Clear once at the start
+        await GetDataAsync(); // Fetch data from both URLs
     }
 
     public async Task AddNewMemberAsync(Member newMember)
@@ -42,13 +44,40 @@ public class RestAPI : MonoBehaviour
             else
             {
                 Debug.Log("New member added: " + request.downloadHandler.text);
-                await GetDataAsync();
+                await InitializeAsync(); // Re-fetch data from both URLs
             }
         }
     }
 
     public async Task GetDataAsync()
     {
+        using (UnityWebRequest request = UnityWebRequest.Get(Legacy_URL))
+        {
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+                await Task.Yield();
+
+            if (request.result == UnityWebRequest.Result.ConnectionError)
+            {
+                Debug.LogError(request.error);
+            }
+            else
+            {
+                string json = request.downloadHandler.text;
+                SimpleJSON.JSONNode stats = SimpleJSON.JSON.Parse(json);
+
+                for (int i = 0; i < stats.Count; i++)
+                {
+                    string name = stats[i]["name"];
+                    int day = stats[i]["birthday"].AsInt;
+                    int month = stats[i]["birthmonth"].AsInt;
+                    print(month.ToString() + " " + day.ToString() + name.ToString());
+                    members.Add(new Member(name, new System.DateTime(2001, month, day)));
+                }
+                Debug.Log("Total number of results from URL: " + members.Count);
+            }
+        }
+
         using (UnityWebRequest request = UnityWebRequest.Get(URL))
         {
             var operation = request.SendWebRequest();
@@ -64,7 +93,6 @@ public class RestAPI : MonoBehaviour
                 string json = request.downloadHandler.text;
                 SimpleJSON.JSONNode stats = SimpleJSON.JSON.Parse(json);
 
-                members.Clear();
                 for (int i = 0; i < stats.Count; i++)
                 {
                     string name = stats[i]["name"];
@@ -73,7 +101,7 @@ public class RestAPI : MonoBehaviour
                     print(month.ToString() + " " + day.ToString() + name.ToString());
                     members.Add(new Member(name, new System.DateTime(2001, month, day)));
                 }
-                Debug.Log("Total number of results: " + members.Count);
+                Debug.Log("Total number of results from URL: " + members.Count);
             }
         }
     }
@@ -81,7 +109,7 @@ public class RestAPI : MonoBehaviour
     public IEnumerator AddNewMember(string name, int birthday, int birthmonth)
     {
         string newMemberJson = JsonUtility.ToJson(new Member(name, new System.DateTime(2001, birthmonth, birthday)));
-            print(newMemberJson);
+        print(newMemberJson);
 
         using (UnityWebRequest request = new UnityWebRequest(URL, "POST"))
         {
@@ -99,11 +127,10 @@ public class RestAPI : MonoBehaviour
             else
             {
                 Debug.Log("New member added: " + request.downloadHandler.text);
-                //StartCoroutine(GetData()); // Refresh the data after adding a new member
+                // StartCoroutine(GetData()); // Optionally refresh data if needed
             }
         }
     }
-
 
     public List<Member> GetMembers()
     {

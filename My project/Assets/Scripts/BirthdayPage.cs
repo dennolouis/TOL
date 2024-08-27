@@ -43,6 +43,13 @@ public class BirthdayPage : MonoBehaviour
         }
     }
 
+    public void AddNewInfoCard(Member member)
+    {
+        GameObject instantiatedUI = Instantiate(infoCardPrefab, panel.transform);
+        instantiatedUI.GetComponent<InfoCard>().SetMember(member);
+        memberCards.Add(instantiatedUI);
+    }
+
     public void HandleBirthdayCardVisability(int monthIdx)
     {
         activememberCards = 0;

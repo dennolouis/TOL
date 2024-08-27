@@ -45,11 +45,16 @@ public class MonthCard : MonoBehaviour
         HandleCurrentMonth(--monthIdx);
     }
 
-    private void HandleCurrentMonth(int month)
+    public void HandleCurrentMonth(int month)
     {
         monthIdx = (month + 12) % 12;
         currentMonth.text = months[monthIdx];
         birthdayPage.HandleBirthdayCardVisability(monthIdx);
         results.text = "Results: " + birthdayPage.GetActivememberCards(); // Ensure results are updated
+    }
+
+    public int GetMonthIdx()
+    {
+        return monthIdx;
     }
 }
